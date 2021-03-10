@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="tailwind.css">
+    <title>Meal App</title>
+</head>
+<body>
+    <!--1. Se connecter à la bdd local storage-->
+
+    <!--2. Boucle qui affiche chaque recette du tableau récupéré-->
+    
+
+    <!--3. Afficher en joli-->
+
+    <!--4. Supprimer la recette de la bdd-->
+
+    
+        <!--Menu-->
+    </div>
+    <div class="flex flex-col items-end container mx-auto px-4" >
+        <ul >
+            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"><a href="" ></a>Accueil</li>
+            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"><a href="fav.html" ></a>Mes fav's</li>
+            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" ><a href="" ></a>Ma semaine</li>
+        </ul>
+    </div>
+
+    <script>
+        //lecture JSON
+        var favMeal_json = sessionStorage.getItem("meal");
+            var favMeal = JSON.parse(favMeal_json);
+    </script>
+</body>
+</html>
