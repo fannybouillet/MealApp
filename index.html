@@ -18,7 +18,7 @@
         </div>
         <!--Bouton favoris-->
         <div class="p-2 bg-pink-50 rounded mb-6">
-            <a  class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" onclick="addFav(currentMeal)">Ajouter aux favoris</a>
+            <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" onclick="addFav()">Ajouter aux favoris</a>
         </div>
         <!--Liste des ingrédients-->
         <div id="list-ingredient" class="flex flex-row flex-wrap">
@@ -37,8 +37,7 @@
 
 
     <script>
-        var currentMeal; 
-        var testCommit;
+        var currentMeal = {};
         //insérer les données de l'api au bon endroit grace aux ID
         const ul = document.getElementById("list-ingredient");
         const instructions = document.getElementById("instructions");
@@ -46,7 +45,6 @@
         const imageMeal = document.getElementById("imageMeal");
 
 
-        
         //Charge une recette random
         function loadRandomRecipe() {
             //1. Se connecter à l'API MealDB
@@ -55,7 +53,7 @@
             let request = new XMLHttpRequest();
             request.open('GET', requestURL);
             request.responseType = 'text';
-            
+
              //2. Récuperer une recette random
             //Envoi de la requete
             request.send();
@@ -64,20 +62,18 @@
             request.onload = function() {
                 //On execute ce code
                 const mealText = request.response;
-                currentMeal = JSON.parse(mealText);
-                //console.log(meals);
-                showMeal(meals);
+                currentMeal = JSON.parse(mealText).meals[0];
+                showMeal(currentMeal);
             }
         }
-   
+
         //3. L'afficher de manière jolie
         function showMeal(currentMeal){
             //On va boucler sur les données
-            var myRecipe = dataFromServer.meals[0];
-            
+            console.log(currentMeal);
             //Ingredients List
             for(var i=1; i <= 20; i++){
-                ingredientValue = myRecipe["strIngredient" + i];
+                ingredientValue = currentMeal["strIngredient" + i];
                 if(ingredientValue !== ''){
                     const ingredient = document.createElement('div');
                     ingredient.className = 'm-2 p-2 bg-indigo-200 rounded text-indigo-900';
@@ -86,17 +82,17 @@
                     ul.appendChild(ingredient);
                 }
             }
-            
+
             //Instructions
-            instructionsValue = myRecipe.strInstructions;
+            instructionsValue = currentMeal.strInstructions;
             instructions.innerHTML= instructionsValue;
-            
-            //Title 
-            mealTitleValue = myRecipe.strMeal;
+
+            //Title
+            mealTitleValue = currentMeal.strMeal;
             mealTitle.innerHTML = mealTitleValue;
 
             //image
-            imageValue=myRecipe.strMealThumb;
+            imageValue=currentMeal.strMealThumb;
             imageMeal.src=imageValue;
 
         }
@@ -106,56 +102,16 @@
         //4. Ajouter en favoris
         // Créer/Modifier un fichier JSON avec le tableau des recettes
 
-        function addFav(dataFromServer, i){
-            
+        function addFav(){
+            alert('coucou');
             //je récupère le localStorage
-            if(JSON.parse(localStorage.getItem("favs")) !=null){
-                var tableauFav=[JSON.parse(localStorage.getItem("favs"))];
-            console.log(tableauFav);
-            }else{
-                tableauFav=[];
+            var arrayFavs = JSON.parse(localStorage.getItem("favs"))
+            if(arrayFavs === null){
+                arrayFavs = [];
             }
-            
-            // je récupère ma recette
-            var myRecipe = dataFromServer.meals[0];
-            //je crée un objet Json avec mes données
-            let objJson = {
-                title : myRecipe.strMeal,
-                instructions : myRecipe.strInstructions,
-                image : myRecipe.strMealThumb,
-                ingredient1 : myRecipe.strIngredient1,
-                ingredient2 : myRecipe.strIngredient2,
-                ingredient3 : myRecipe.strIngredient3,
-                ingredient4 : myRecipe.strIngredient4,
-                ingredient5 : myRecipe.strIngredient5,
-                ingredient6 : myRecipe.strIngredient6,
-                ingredient7 : myRecipe.strIngredient7,
-                ingredient8 : myRecipe.strIngredient8,
-                ingredient9 : myRecipe.strIngredient9,
-                ingredient10 : myRecipe.strIngredient10,
-                ingredient11 : myRecipe.strIngredient11,
-                ingredient12 : myRecipe.strIngredient12,
-                ingredient13 : myRecipe.strIngredient13,
-                ingredient14 : myRecipe.strIngredient14,
-                ingredient15 : myRecipe.strIngredient15,
-                ingredient16 : myRecipe.strIngredient16,
-                ingredient17 : myRecipe.strIngredient17,
-                ingredient18 : myRecipe.strIngredient18,
-                ingredient19 : myRecipe.strIngredient19,
-                ingredient20 : myRecipe.strIngredient20,
-            }
-
-            tableauFav.push(objJson);
-
-            //je teste en console.log
-            console.log(tableauFav);
-            //J'enregistre en localStorage
-            let objLinea = JSON.stringify(tableauFav);
-            localStorage.setItem("favs",objLinea);
-
-        
-
-       }      
+            arrayFavs.push(currentMeal);
+            localStorage.setItem("favs",JSON.stringify(arrayFavs));
+       }
     </script>
 </body>
 </html>
