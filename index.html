@@ -5,11 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="forms.css">
     <title>Meal App</title>
 </head>
 <body>
 
     <div class="flex flex-col items-center container mx-auto px-4 ">
+          <!--Menu-->
+          <div class="flex flex-row items-start px-4" >
+            <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" href="index.html" >Random Recipe</a>
+            <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" href="/fav" >Favorites</a>
+            <input type="search" id="search-bar" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
+          </div>
         <!--Titre de la recette-->
         <h1 id="meal" class="text-5xl font-black">Titre de la recette</h1>
         <!--Image de la recette-->
@@ -26,16 +33,6 @@
         </div>
         <p id="instructions" class="rounded bg-gray-50 p-4">Loading instructions...</p>
     </div>
-    <!--Menu-->
-    <div class="flex flex-col items-end container mx-auto px-4" >
-        <ul >
-            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"><a href="index.html" >Accueil</a></li>
-            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"><a href="fav.html" >Mes fav's</a></li>
-            <li class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" ><a href="week.html" >Ma semaine</a></li>
-        </ul>
-    </div>
-
-
     <script>
         var currentMeal = {};
         //insérer les données de l'api au bon endroit grace aux ID
@@ -43,13 +40,24 @@
         const instructions = document.getElementById("instructions");
         const mealTitle = document.getElementById("meal");
         const imageMeal = document.getElementById("imageMeal");
+        const searchBar = document.getElementById("search-bar");
 
+
+        // https://www.themealdb.com/api/json/v1/1/lookup.php?i=52772
+        const queryString = window.location.href;
+        const urlParams = new URL(queryString);
+        var id = urlParams.searchParams.get('id');
+        loadRecipe(id);
 
         //Charge une recette random
-        function loadRandomRecipe() {
+        function loadRecipe(id = null) {
             //1. Se connecter à l'API MealDB
+            var requestURL = 'https://www.themealdb.com/api/json/v1/1/random.php';
             //On cree la requete
-            let requestURL = 'https://www.themealdb.com/api/json/v1/1/random.php';
+            if(id !== null){
+              requestURL = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
+            }
+
             let request = new XMLHttpRequest();
             request.open('GET', requestURL);
             request.responseType = 'text';
@@ -97,7 +105,7 @@
 
         }
 
-        loadRandomRecipe();
+        //loadRandomRecipe();
 
         //4. Ajouter en favoris
         // Créer/Modifier un fichier JSON avec le tableau des recettes
