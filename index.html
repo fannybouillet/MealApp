@@ -9,13 +9,12 @@
     <title>Meal App</title>
 </head>
 <body>
-
     <div class="flex flex-col items-center container mx-auto px-4 ">
           <!--Menu-->
-          <div class="flex flex-row items-start px-4" >
+          <div class="flex flex-row px-4 items-center" >
             <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" href="index.html" >Random Recipe</a>
             <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" href="fav.html" >Favorites</a>
-            <input type="search" id="search-bar" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+            <input type="search" id="search-bar" placeholder="Search for a recipe..." class="border-2 rounded border-black shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
             <a class="text-pink-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" onclick="searchRecipe()">Search</a>
           </div>
         <!--Titre de la recette-->
@@ -33,11 +32,11 @@
         <!--Instructions-->
         </div>
         <p id="instructions" class="rounded bg-gray-50 p-4">Loading instructions...</p>
+        <hr>
+        <div id="search-result" class="container mx-auto p-6 rounded-md shadow-lg">
+        </div>
     </div>
-    <div id="searchDiv" class="text-5xl font-black">
 
-
-    </div>
     <script>
         var currentMeal = {};
         //insérer les données de l'api au bon endroit grace aux ID
@@ -46,8 +45,7 @@
         const mealTitle = document.getElementById("meal");
         const imageMeal = document.getElementById("imageMeal");
         const searchBar = document.getElementById("search-bar");
-        const searchDiv = document.getElementById("searchDiv");
-
+        const searchDiv = document.getElementById("search-result");
 
         //https://www.themealdb.com/api/json/v1/1/lookup.php?i=52772
         const queryString = window.location.href;
@@ -116,7 +114,7 @@
             //console.log(currentMeal);
 
             var idRecipe=currentMeal.idMeal;
-            
+
             //console.log("mon id CurrentRecette"+idRecipe);
             //je récupère le localStorage
             var arrayFavs = JSON.parse(localStorage.getItem("favs"));
@@ -130,8 +128,8 @@
                 //console.log("idMeal numéro " +i+"est le suivant "+arrayFavs[i].idMeal);
                 if(arrayFavs[i].idMeal===idRecipe){
                     AlreadyInFavs=true;
-                } 
-                //console.log(AlreadyInFavs)     
+                }
+                //console.log(AlreadyInFavs)
             }
             if(AlreadyInFavs===true)
                 alert("impossible to add in favorite, the recipe is already in favorite");
@@ -144,25 +142,19 @@
     }
 
     function searchRecipe(){
-        if(searchDiv.innerHTML !== ""){
-            var element = document.getElementById("searchDiv");
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
-        }
-        
+
         //récupérer le texte dans l'input
-        var saisie =document.getElementById("search-bar").value;
+        var searchQuery = document.getElementById("search-bar").value;
         //alert("vous avez chercher : "+saisie)
-        
+
 
         //se connecter à l'API
-        var requeteURL = "https://www.themealdb.com/api/json/v1/1/search.php?s="+saisie;
+        var requestURL = `https://www.themealdb.com/api/json/v1/1/search.php?s=${searchQuery}`;
             //charge la recette demandée
-            
+
             //On cree la requete
             let request = new XMLHttpRequest();
-            request.open('GET', requeteURL);
+            request.open('GET', requestURL);
             request.responseType = 'text';
 
              //2. Récuperer une recette random
@@ -173,75 +165,56 @@
             //Au moment de la récupération (réponse du serveur)
             request.onload = function() {
                 //On execute ce code
+                searchDiv.innerHTML = "";
+
                 const searchMealText = request.response;
                 searchMeal = JSON.parse(searchMealText).meals;
-                console.log(searchMeal);
+
+                var mySearchTitle = document.createElement('h2');
+                mySearchTitle.className = 'text-5xl font-black';
+                mySearchTitle.innerHTML = `Your results for "${searchQuery}":`;
+
+                searchDiv.appendChild(mySearchTitle);
+
+                searchDiv.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
 
                 //afficher le résultat
-                searchDiv.innerHTML = "My search";
-                    if(searchMeal ===[] || searchMeal ==null){
-                        var noresult = document.createElement("p");
-                        document.body.appendChild(noresult);           
-                        noresult.className = 'text-2xl font-black';
-                        noresult.id='mealsearch';  
-                        noresult.textContent = "No result";
-                    }
-                    else
-                searchMeal.forEach(element =>showSearchMeal(searchMeal));
+                if(searchMeal === [] || searchMeal === null){
+                    var noresult = document.createElement("p");
+                    searchDiv.appendChild(noresult);
+                    noresult.className = 'text-l font-black';
+                    noresult.id='mealsearch';
+                    noresult.textContent = "No result";
+                }
+                else {
+                  console.log(searchMeal);
+                  displayMealSearchResult(searchMeal);
+                }
             }
 
     }
-    function showSearchMeal(tableau){
-        if(searchDiv.innerHTML !== ""){
-            var element = document.getElementById("searchDiv");
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
+    function displayMealSearchResult(results){
+            //console.log(tableau);
+            results.forEach(function(recipe, index){
+              const elementList = document.createElement('li');
+              elementList.className = 'flex flex-row my-8 items-center';
+              const htmlForRecipe = `
+                  <h4 class="mr-6">${index}</h4>
+                  <a href="/?id=${recipe.idMeal}" class="flex">
+                    <div class="rounded-xxl shadow-lg overflow-hidden">
+                      <img src='${recipe.strMealThumb}' width="70" />
+                    </div>
+                    <div class="flex flex-col ml-8">
+                      <h2 class="text-pink-500 text-xxl font-black"> ${recipe.strMeal} </h2>
+                      <p> ${recipe.strInstructions.substring(0,100)} ... </p>
+                    </div>
+                  </a>
+              `;
+              elementList.innerHTML = htmlForRecipe;
+              searchDiv.appendChild(elementList);
+            })
         }
-        }
-        //console.log(tableau);
-       
-            //console.log(tableau[0].strMeal);
-            for(let i =0 ; i<tableau.length;i++){
-                
-                //console.log(tableau[i].strMeal);
-                var titleSearchRecipe = document.createElement("p");
-                document.body.appendChild(titleSearchRecipe);  
-                titleSearchRecipe.id='mealsearch';        
-                titleSearchRecipe.className = 'text-2xl font-black';
-                titleSearchRecipe.textContent = tableau[i].strMeal;
 
-                //TODO afficher l'image
-                var imageSearchRecipe = document.createElement("a");
-                document.body.appendChild(imageSearchRecipe);
-                imageSearchRecipe.id='mealsearch';              
-                imageSearchRecipe.className = 'text-2xl font-black';
-                console.log(tableau[i].strMealThumb);
-                imageSearchRecipe.src = tableau[i].strMealThumb;
-
-                var instructionSearchRecipe = document.createElement("p");
-                document.body.appendChild(instructionSearchRecipe); 
-                instructionSearchRecipe.id='mealsearch';           
-                instructionSearchRecipe.className = 'rounded bg-gray-50 p-4';
-                instructionSearchRecipe.textContent = tableau[i].strInstructions;
-
-                //console.log(tableau[i]);
-                //TODO afficher les ingredients
-                for(var j=1; j <= 20; j++){
-                    ingredientValue = tableau[i]["strIngredient" + j];     
-                    //console.log(ingredientValue)
-                    if(ingredientValue !== ''){
-                        const searchIngredient = document.createElement('p');
-                        searchIngredient.id='mealsearch'; 
-                        document.body.appendChild(searchIngredient);
-                        searchIngredient.className = 'm-2 p-2 bg-indigo-200 rounded text-indigo-900';
-                        searchIngredient.textContent = ingredientValue;
-
-                        
-                    }
-                }       
-            }
-        }
-    
 
     </script>
 </body>
